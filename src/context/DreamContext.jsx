@@ -1,109 +1,119 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { db } from '../services/firebase';
-import { 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  onSnapshot, 
-  addDoc, 
-  deleteDoc, 
-  doc, 
-  updateDoc,
-  serverTimestamp
-} from 'firebase/firestore';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 export const DreamContext = createContext();
 
 export const DreamProvider = ({ children }) => {
-  const { user } = useAuth();
-  const [dreams, setDreams] = useState([]);
-  const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
+    const [dreams, setDreams] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
-      setDreams([]);
-      setLoading(false);
-      return;
-    }
+    // Initial load from localStorage
+    useEffect(() => {
+        if (!user) {
+            setDreams([]);
+            setLoading(false);
+            return;
+        }
 
-    setLoading(true);
-    // Path: users/{uid}/dreams/{dreamId}
-    const dreamsRef = collection(db, 'users', user.uid, 'dreams');
-    // Order by date descending
-    const q = query(dreamsRef, orderBy('date', 'desc'), orderBy('createdAt', 'desc'));
+        setLoading(true);
+        const storageKey = `dreamscape_dreams_${user.uid}`;
+        const storedDreams = localStorage.getItem(storageKey);
+        
+        if (storedDreams) {
+            try {
+                // Parse and sort by date descending (latest first)
+                const parsedDreams = JSON.parse(storedDreams);
+                const sortedDreams = parsedDreams.sort((a, b) => {
+                    const dateA = new Date(a.date || a.createdAt);
+                    const dateB = new Date(b.date || b.createdAt);
+                    return dateB - dateA;
+                });
+                setDreams(sortedDreams);
+            } catch (e) {
+                console.error("Failed to parse dreams from storage", e);
+                setDreams([]);
+            }
+        } else {
+            setDreams([]);
+        }
+        setLoading(false);
+    }, [user]);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const dreamsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setDreams(dreamsData);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching dreams:", error);
-      toast.error("Failed to load dreams.");
-      setLoading(false);
-    });
+    // Helper to persist dreams to localStorage and update state
+    const persistDreams = useCallback((newDreams) => {
+        if (!user) return;
+        const storageKey = `dreamscape_dreams_${user.uid}`;
+        localStorage.setItem(storageKey, JSON.stringify(newDreams));
+        setDreams(newDreams);
+    }, [user]);
 
-    return () => unsubscribe();
-  }, [user]);
+    const addDream = useCallback(async (dreamData) => {
+        if (!user) return;
+        try {
+            // Simulated delay for premium feel
+            await new Promise(resolve => setTimeout(resolve, 600));
 
-  const addDream = useCallback(async (dreamData) => {
-    if (!user) return;
-    try {
-      const dreamsRef = collection(db, 'users', user.uid, 'dreams');
-      await addDoc(dreamsRef, {
-        ...dreamData,
-        createdAt: serverTimestamp()
-      });
-      toast.success('Dream logged successfully!');
-    } catch (error) {
-      console.error("Error adding dream:", error);
-      toast.error('Failed to save dream.');
-      throw error;
-    }
-  }, [user]);
+            const newDream = {
+                id: 'dream_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                ...dreamData,
+                createdAt: new Date().toISOString()
+            };
+            
+            const updatedDreams = [newDream, ...dreams];
+            persistDreams(updatedDreams);
+            toast.success('Dream logged successfully!');
+        } catch (error) {
+            console.error("Error adding dream:", error);
+            toast.error('Failed to save dream.');
+            throw error;
+        }
+    }, [user, dreams, persistDreams]);
 
-  const updateDream = useCallback(async (dreamId, updatedData) => {
-    if (!user) return;
-    try {
-      const dreamRef = doc(db, 'users', user.uid, 'dreams', dreamId);
-      await updateDoc(dreamRef, updatedData);
-      toast.success('Dream updated successfully!');
-    } catch (error) {
-      console.error("Error updating dream:", error);
-      toast.error('Failed to update dream.');
-      throw error;
-    }
-  }, [user]);
+    const updateDream = useCallback(async (dreamId, updatedData) => {
+        if (!user) return;
+        try {
+            await new Promise(resolve => setTimeout(resolve, 400));
 
-  const deleteDream = useCallback(async (dreamId) => {
-    if (!user) return;
-    try {
-      const dreamRef = doc(db, 'users', user.uid, 'dreams', dreamId);
-      await deleteDoc(dreamRef);
-      toast.success('Dream deleted.');
-    } catch (error) {
-      console.error("Error deleting dream:", error);
-      toast.error('Failed to delete dream.');
-      throw error;
-    }
-  }, [user]);
+            const updatedDreams = dreams.map(dream => 
+                dream.id === dreamId ? { ...dream, ...updatedData, updatedAt: new Date().toISOString() } : dream
+            );
+            persistDreams(updatedDreams);
+            toast.success('Dream updated successfully!');
+        } catch (error) {
+            console.error("Error updating dream:", error);
+            toast.error('Failed to update dream.');
+            throw error;
+        }
+    }, [user, dreams, persistDreams]);
 
-  const value = {
-    dreams,
-    addDream,
-    updateDream,
-    deleteDream,
-    loading
-  };
+    const deleteDream = useCallback(async (dreamId) => {
+        if (!user) return;
+        try {
+            await new Promise(resolve => setTimeout(resolve, 400));
 
-  return (
-    <DreamContext.Provider value={value}>
-      {children}
-    </DreamContext.Provider>
-  );
+            const updatedDreams = dreams.filter(dream => dream.id !== dreamId);
+            persistDreams(updatedDreams);
+            toast.success('Dream deleted.');
+        } catch (error) {
+            console.error("Error deleting dream:", error);
+            toast.error('Failed to delete dream.');
+            throw error;
+        }
+    }, [user, dreams, persistDreams]);
+
+    const value = {
+        dreams,
+        addDream,
+        updateDream,
+        deleteDream,
+        loading
+    };
+
+    return (
+        <DreamContext.Provider value={value}>
+            {children}
+        </DreamContext.Provider>
+    );
 };
