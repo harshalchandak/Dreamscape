@@ -73,7 +73,7 @@ const DreamDetail = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white/5 rounded-xl p-4 border border-white/5">
             <div className="flex items-center text-textMuted text-sm mb-2">
-              <Moon className="w-4 h-4 mr-2 text-indigo-400" />
+              <Moon className="w-4 h-4 mr-2 text-cyan-400" />
               Before Sleep
             </div>
             <div className="text-2xl font-semibold text-white">{dream.moodBefore}/10</div>

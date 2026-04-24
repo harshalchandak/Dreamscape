@@ -8,7 +8,7 @@ const tagColors = {
   Fear: '#ef4444',
   Anxiety: '#f97316',
   Peace: '#22c55e',
-  Confusion: '#a855f7',
+  Confusion: '#06b6d4',
   Sadness: '#3b82f6',
   Excitement: '#ec4899',
   Anger: '#b91c1c',
@@ -29,7 +29,7 @@ export const EmotionChart = ({ dreams }) => {
       .map(tag => ({
         name: tag,
         count: freqMap[tag],
-        color: tagColors[tag] || '#a855f7'
+        color: tagColors[tag] || '#06b6d4'
       }))
       .sort((a, b) => b.count - a.count);
   }, [dreams]);
@@ -56,7 +56,7 @@ export const EmotionChart = ({ dreams }) => {
           <YAxis hide />
           <Tooltip 
             cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
-            contentStyle={{ backgroundColor: '#12101f', borderColor: '#a855f7', borderRadius: '8px' }}
+            contentStyle={{ backgroundColor: '#12101f', borderColor: '#06b6d4', borderRadius: '8px' }}
           />
           <Bar dataKey="count" radius={[4, 4, 0, 0]}>
             {data.map((entry, index) => (

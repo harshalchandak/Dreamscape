@@ -126,7 +126,7 @@ const Dashboard = () => {
               <p className="text-sm text-textMuted mb-6">
                 Let AI analyze your recent dreams to reveal hidden emotional patterns and psychological themes.
               </p>
-              <Link to="/analysis" className="btn-primary w-full block text-center shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+              <Link to="/analysis" className="btn-primary w-full block text-center shadow-[0_0_15px_rgba(6,182,212,0.4)]">
                 Analyze My Dreams
               </Link>
             </div>

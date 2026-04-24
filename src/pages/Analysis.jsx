@@ -61,7 +61,7 @@ const Analysis = () => {
           <button 
             onClick={handleAnalyze} 
             disabled={dreams.length === 0}
-            className="btn-primary flex items-center justify-center w-full sm:w-auto sm:mx-auto shadow-[0_0_20px_rgba(168,85,247,0.3)] disabled:opacity-50 disabled:shadow-none"
+            className="btn-primary flex items-center justify-center w-full sm:w-auto sm:mx-auto shadow-[0_0_20px_rgba(6,182,212,0.3)] disabled:opacity-50 disabled:shadow-none"
           >
             <Sparkles className="w-5 h-5 mr-2" />
             {dreams.length === 0 ? 'Not enough dreams to analyze' : 'Start Deep Analysis'}

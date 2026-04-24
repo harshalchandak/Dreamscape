@@ -30,7 +30,7 @@ export const DreamCard = ({ dream }) => {
         <div className="flex items-center justify-between text-xs text-textMuted border-t border-white/5 pt-3">
           <div className="flex items-center space-x-4">
             <div className="flex items-center" title="Mood Before Sleep">
-              <Moon className="w-4 h-4 mr-1 text-indigo-400" />
+              <Moon className="w-4 h-4 mr-1 text-cyan-400" />
               <span>{dream.moodBefore}/10</span>
             </div>
             <div className="flex items-center" title="Mood After Waking">

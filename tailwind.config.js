@@ -10,8 +10,8 @@ export default {
       colors: {
         background: '#0a0a14',
         surface: '#12101f',
-        primary: '#a855f7',
-        accent: '#6366f1',
+        primary: '#06b6d4',
+        accent: '#0ea5e9',
         textPrimary: '#e8e0f0',
         textMuted: '#6b7280',
         danger: '#ef4444',
